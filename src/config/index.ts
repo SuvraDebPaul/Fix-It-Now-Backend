@@ -10,6 +10,7 @@ const config = {
   port: env.PORT,
   app_url: env.APP_URL,
   database_url: env.DATABASE_URL,
+  node_env: env.NODE_ENV,
 };
 
 export default config;

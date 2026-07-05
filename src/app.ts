@@ -2,6 +2,8 @@ import express, { Application, Request, Response } from "express";
 import cors from "cors";
 import config from "./config";
 import cookieParser from "cookie-parser";
+import { notFound } from "./middleware/notFound";
+import { globalErrorHandler } from "./middleware/globalErrorHandler";
 
 const app: Application = express();
 
@@ -14,4 +16,6 @@ app.get("/", (req: Request, res: Response) => {
   res.send("Fix It Now Server Running");
 });
 
+app.use(notFound);
+app.use(globalErrorHandler);
 export default app;
