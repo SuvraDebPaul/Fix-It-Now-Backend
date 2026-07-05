@@ -1,2 +1,12 @@
 node_modules
-/generated/prisma
+generated/
+.prisma/
+
+dist/
+build/
+
+.env
+.env.*
+!.env.example
+
+.vercel/
