@@ -7,10 +7,18 @@ dotenv.config({
 });
 
 const config = {
+  node_env: env.NODE_ENV,
+
   port: env.PORT,
   app_url: env.APP_URL,
+
   database_url: env.DATABASE_URL,
-  node_env: env.NODE_ENV,
+
+  bcrypt_salt_rounds: env.BCRYPT_SALT_ROUNDS || 12,
+  jwt_access_secret: env.JWT_ACCESS_SECRET,
+  jwt_refresh_secret: env.JWT_REFRESH_SECRET,
+  jwt_access_expires_in: env.JWT_ACCESS_EXPIRES_IN || "1d",
+  jwt_refresh_expires_in: env.JWT_REFRESH_EXPIRES_IN || "7d",
 };
 
 export default config;

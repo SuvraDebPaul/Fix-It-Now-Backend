@@ -4,6 +4,8 @@ import config from "./config";
 import cookieParser from "cookie-parser";
 import { notFound } from "./middleware/notFound";
 import { globalErrorHandler } from "./middleware/globalErrorHandler";
+import userRoutes from "./modules/users/user.routes";
+import authRoutes from "./modules/auth/auth.routes";
 
 const app: Application = express();
 
@@ -15,6 +17,13 @@ app.use(express.urlencoded({ extended: true }));
 app.get("/", (req: Request, res: Response) => {
   res.send("Fix It Now Server Running");
 });
+
+app.get("/api", (req: Request, res: Response) => {
+  res.send("Fix It Now API is Running");
+});
+
+app.use("/api/auth", userRoutes);
+app.use("/api/auth", authRoutes);
 
 app.use(notFound);
 app.use(globalErrorHandler);

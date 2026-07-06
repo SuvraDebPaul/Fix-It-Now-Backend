@@ -1,16 +1,15 @@
 model User {
-  id           String     @id @default(uuid())
-  name         String
-  email        String     @unique
-  password     String
-  phone        String?
-  role         Role       @default(CUSTOMER)
-  status       UserStatus @default(ACTIVE)
-  profilePhoto String?
-  address      String?
-  city         String?
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+  id        String     @id @default(uuid())
+  name      String     
+  email     String     @unique 
+  password  String     
+  role      Role       @default(CUSTOMER)
+  status    UserStatus @default(ACTIVE)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  customerProfile   CustomerProfile?
+  technicianProfile TechnicianProfile?
 
   @@map("users")
 }

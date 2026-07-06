@@ -1,8 +1,8 @@
 import type { Request, Response } from "express";
-import status from "http-status";
+import httpStatus from "http-status";
 
 export const notFound = (req: Request, res: Response) => {
-  res.status(status.NOT_FOUND).json({
+  res.status(httpStatus.NOT_FOUND).json({
     success: false,
     message: "API route not found",
     path: req.originalUrl,
