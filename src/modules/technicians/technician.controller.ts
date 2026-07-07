@@ -47,4 +47,39 @@ const gelAllServices = catchAsync(
   },
 );
 
-export const technicianController = { createNewService, gelAllServices };
+const getTechnicianProfile = catchAsync(
+  async (req: Request, res: Response, Next: NextFunction) => {
+    const { id } = req.params;
+
+    const profile = await technicianService.getTechnicianProfileFromDB(
+      id as string,
+    );
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Technician Profile Fetched",
+      data: profile,
+    });
+  },
+);
+
+const getAllTechnician = catchAsync(
+  async (req: Request, res: Response, Next: NextFunction) => {
+    const allTechnician = await technicianService.getAllTechnicianFromDB();
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Technician Profile Fetched",
+      data: allTechnician,
+    });
+  },
+);
+
+export const technicianController = {
+  createNewService,
+  gelAllServices,
+  getTechnicianProfile,
+  getAllTechnician,
+};
