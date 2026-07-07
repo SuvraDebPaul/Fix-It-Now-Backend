@@ -19,5 +19,6 @@ model Booking {
   review              Review?
   payment             Payment?
 
+  @@index([customerProfileId])
   @@map("bookings")
 }

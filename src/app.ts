@@ -6,6 +6,8 @@ import { notFound } from "./middleware/notFound";
 import { globalErrorHandler } from "./middleware/globalErrorHandler";
 import userRoutes from "./modules/users/user.routes";
 import authRoutes from "./modules/auth/auth.routes";
+import adminRoutes from "./modules/admin/admin.routes";
+import { categoryRoutes } from "./modules/category/category.routes";
 
 const app: Application = express();
 
@@ -22,8 +24,12 @@ app.get("/api", (req: Request, res: Response) => {
   res.send("Fix It Now API is Running");
 });
 
+app.use("/api", categoryRoutes);
+
 app.use("/api/auth", userRoutes);
 app.use("/api/auth", authRoutes);
+
+app.use("/api/admin", adminRoutes);
 
 app.use(notFound);
 app.use(globalErrorHandler);

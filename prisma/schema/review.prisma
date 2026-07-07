@@ -12,5 +12,7 @@ model Review {
   customerProfile     CustomerProfile   @relation(fields: [customerProfileId], references: [id], onDelete: Cascade)
   technicianProfile   TechnicianProfile @relation(fields: [technicianProfileId], references: [id], onDelete: Cascade)
 
+  @@index([bookingId])
+  @@index([customerProfileId])
   @@map("reviews")
 }
