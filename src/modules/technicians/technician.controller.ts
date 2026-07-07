@@ -77,9 +77,48 @@ const getAllTechnician = catchAsync(
   },
 );
 
+const updateTechnicianProfile = catchAsync(
+  async (req: Request, res: Response, Next: NextFunction) => {
+    const userid = req.user?.id;
+    const payload = req.body;
+
+    const updatedProfile = await technicianService.updateTechnicianProfile(
+      userid as string,
+      payload,
+    );
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Technician Profile Updated",
+      data: updatedProfile,
+    });
+  },
+);
+
+const updateAvaiablitySlots = catchAsync(
+  async (req: Request, res: Response, Next: NextFunction) => {
+    const userId = req.user?.id;
+
+    const result = await technicianService.updateAvailabilityIntoDB(
+      userId as string,
+      req.body,
+    );
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Availability updated successfully",
+      data: result,
+    });
+  },
+);
+
 export const technicianController = {
   createNewService,
   gelAllServices,
   getTechnicianProfile,
   getAllTechnician,
+  updateTechnicianProfile,
+  updateAvaiablitySlots,
 };

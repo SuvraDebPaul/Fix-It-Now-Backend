@@ -1,7 +1,12 @@
 import httpStatus from "http-status";
 import AppError from "../../errors/AppError";
 import { prisma } from "../../lib/prisma";
-import { IServicePayload } from "./technician.interface";
+import {
+  IServicePayload,
+  ITechnicialProfileUpdatePayload,
+  IUpdateAvaiablityPayload,
+} from "./technician.interface";
+import { isValidTimeFormat, timeToMinutes } from "../../utils/utils";
 
 const createNewServiceIntoDB = async (
   payload: IServicePayload,
@@ -70,9 +75,115 @@ const getAllTechnicianFromDB = async () => {
   return allTechnician;
 };
 
+const updateTechnicianProfile = async (
+  userId: string,
+  payload: ITechnicialProfileUpdatePayload,
+) => {
+  const updatedProfile = await prisma.technicianProfile.update({
+    where: {
+      userId,
+    },
+    data: {
+      ...payload,
+    },
+    include: {
+      user: {
+        omit: {
+          password: true,
+        },
+      },
+    },
+  });
+
+  return updatedProfile;
+};
+
+const updateAvailabilityIntoDB = async (
+  userId: string,
+  payload: IUpdateAvaiablityPayload,
+) => {
+  const { slots } = payload;
+
+  if (!Array.isArray(slots)) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Slots must be an array");
+  }
+
+  slots.forEach((slot) => {
+    if (!slot.day || !slot.startTime || !slot.endTime) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "Day, startTime and endTime are required",
+      );
+    }
+    if (
+      !isValidTimeFormat(slot.startTime) ||
+      !isValidTimeFormat(slot.endTime)
+    ) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "Time must be in HH:mm format. Example: 09:00",
+      );
+    }
+    if (timeToMinutes(slot.startTime) >= timeToMinutes(slot.endTime)) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "Start time must be before end time",
+      );
+    }
+  });
+
+  const technicianProfile = await prisma.technicianProfile.findUnique({
+    where: {
+      userId,
+    },
+  });
+  if (!technicianProfile) {
+    throw new AppError(httpStatus.NOT_FOUND, "Technician profile not found");
+  }
+  const result = await prisma.$transaction(async (tx) => {
+    await tx.availabilitySlot.deleteMany({
+      where: {
+        technicianProfileId: technicianProfile.id,
+      },
+    });
+
+    if (slots.length > 0) {
+      await tx.availabilitySlot.createMany({
+        data: slots.map((slot) => ({
+          technicianProfileId: technicianProfile.id,
+          day: slot.day,
+          startTime: slot.startTime,
+          endTime: slot.endTime,
+          isActive: slot.isActive ?? true,
+        })),
+      });
+    }
+
+    const updatedSlots = await tx.availabilitySlot.findMany({
+      where: {
+        technicianProfileId: technicianProfile.id,
+      },
+      orderBy: [
+        {
+          day: "asc",
+        },
+        {
+          startTime: "asc",
+        },
+      ],
+    });
+
+    return updatedSlots;
+  });
+
+  return result;
+};
+
 export const technicianService = {
   createNewServiceIntoDB,
   getAllServicesFromDB,
   getTechnicianProfileFromDB,
   getAllTechnicianFromDB,
+  updateTechnicianProfile,
+  updateAvailabilityIntoDB,
 };

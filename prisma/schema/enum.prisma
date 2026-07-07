@@ -30,3 +30,13 @@ enum PaymentStatus {
   FAILED
   REFUNDED
 }
+
+enum AvailabilityDay {
+  SATURDAY
+  SUNDAY
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+}
