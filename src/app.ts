@@ -11,6 +11,7 @@ import { categoryRoutes } from "./modules/categories/category.routes";
 import { technicianRoutes } from "./modules/technicians/technician.routes";
 import { bookingRoutes } from "./modules/bookings/booking.routes";
 import { paymentRoutes } from "./modules/payments/payment.routes";
+import { reviewRoutes } from "./modules/reviews/review.routes";
 
 const app: Application = express();
 
@@ -37,6 +38,8 @@ app.use("/api", bookingRoutes);
 app.use("/api/admin", adminRoutes);
 
 app.use("/api", paymentRoutes);
+
+app.use("/api", reviewRoutes);
 
 app.use(notFound);
 app.use(globalErrorHandler);
