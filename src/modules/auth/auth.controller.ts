@@ -3,10 +3,19 @@ import catchAsync from "../../utils/catchAsync";
 import { authService } from "./auth.service";
 import sendResponse from "../../utils/sendResponse";
 import httpStatus from "http-status";
+import AppError from "../../errors/AppError";
 
 const loginUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const payload = req.body;
+    const { email, password } = payload;
+
+    if (!email || !password) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "Email and password are required",
+      );
+    }
     const { accessToken, refreshToken } = await authService.loginUser(payload);
 
     res.cookie("accessToken", accessToken, {

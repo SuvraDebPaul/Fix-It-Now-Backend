@@ -13,18 +13,11 @@ const createNewBookingIntoDB = async (
       userId,
     },
   });
-  if (!customerProfile) {
-    throw new Error("Customer profile not found");
-  }
-  const service = await prisma.service.findUnique({
+  const service = await prisma.service.findUniqueOrThrow({
     where: {
       id: serviceId,
     },
   });
-  if (!service) {
-    throw new Error("Service not found");
-  }
-
   if (!service.isActive) {
     throw new Error("This service is currently not available");
   }

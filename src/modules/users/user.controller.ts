@@ -4,18 +4,38 @@ import { userServices } from "./user.service";
 import AppError from "../../errors/AppError";
 import httpStatus from "http-status";
 import sendResponse from "../../utils/sendResponse";
-import jwt from "jsonwebtoken";
-import config from "../../config";
-import { jwtUtils } from "../../utils/jwt";
 
 const createUser = catchAsync(async (req: Request, res: Response) => {
   const payload = req.body;
 
-  const { name, email, password } = payload;
-  if (!name && !email && password) {
+  const { name, email, password, role } = payload;
+
+  if (!name || !email || !password) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
-      "Please Provide the required data",
+      "Name, email and password are required",
+    );
+  }
+
+  const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!EMAIL_REGEX.test(email)) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "Please provide a valid email address",
+    );
+  }
+
+  if (password.length < 6) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "Password must be at least 6 characters long",
+    );
+  }
+
+  if (role && !["CUSTOMER", "TECHNICIAN"].includes(role)) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "Role must be either CUSTOMER or TECHNICIAN",
     );
   }
 

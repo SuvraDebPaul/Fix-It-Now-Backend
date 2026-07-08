@@ -36,3 +36,18 @@ export interface IUpdateAvaiablityPayload {
 export interface IUpdateBookingStatusPayload {
   status: "ACCEPTED" | "DECLINED" | "IN_PROGRESS" | "COMPLETED";
 }
+
+export interface IServiceFilters {
+  categoryId?: string;
+  location?: string;
+  minPrice?: string;
+  maxPrice?: string;
+  minRating?: string;
+}
+
+export interface ITechnicianFilters {
+  location?: string;
+  minRating?: string;
+  isAvailable?: string;
+  categoryId?: string;
+}

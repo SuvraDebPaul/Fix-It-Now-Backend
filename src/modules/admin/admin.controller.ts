@@ -8,8 +8,13 @@ import AppError from "../../errors/AppError";
 const createNewCategory = catchAsync(
   async (req: Request, res: Response, Next: NextFunction) => {
     const payload = req.body;
-    if (!payload.name) {
-      throw new AppError(httpStatus.BAD_REQUEST, "Invalid Data");
+    const { name, slug } = payload;
+
+    if (!name || typeof name !== "string") {
+      throw new AppError(httpStatus.BAD_REQUEST, "Category name is required");
+    }
+    if (!slug || typeof slug !== "string") {
+      throw new AppError(httpStatus.BAD_REQUEST, "Category slug is required");
     }
     const newCategory = await adminService.createNewCategoryIntoDB(payload);
 

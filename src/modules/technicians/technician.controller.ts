@@ -37,7 +37,7 @@ const createNewService = catchAsync(
 
 const gelAllServices = catchAsync(
   async (req: Request, res: Response, Next: NextFunction) => {
-    const allServices = await technicianService.getAllServicesFromDB();
+    const allServices = await technicianService.getAllServicesFromDB(req.query);
     sendResponse(res, {
       success: true,
       statusCode: httpStatus.OK,
@@ -66,7 +66,9 @@ const getTechnicianProfile = catchAsync(
 
 const getAllTechnician = catchAsync(
   async (req: Request, res: Response, Next: NextFunction) => {
-    const allTechnician = await technicianService.getAllTechnicianFromDB();
+    const allTechnician = await technicianService.getAllTechnicianFromDB(
+      req.query,
+    );
 
     sendResponse(res, {
       success: true,
@@ -134,11 +136,40 @@ const updateBookingStatus = catchAsync(
   async (req: Request, res: Response, Next: NextFunction) => {
     const userId = req.user?.id as string;
     const { id } = req.params;
+    const payload = req.body;
+    const { experience, hourlyRate, isAvailable } = payload;
+
+    if (
+      experience !== undefined &&
+      (typeof experience !== "number" || experience < 0)
+    ) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "Experience must be a positive number",
+      );
+    }
+
+    if (
+      hourlyRate !== undefined &&
+      (typeof hourlyRate !== "number" || hourlyRate < 0)
+    ) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "Hourly rate must be a positive number",
+      );
+    }
+
+    if (isAvailable !== undefined && typeof isAvailable !== "boolean") {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "isAvailable must be true or false",
+      );
+    }
 
     const updatedBooking = await technicianService.updateBookingStatusIntoDB(
       userId,
       id as string,
-      req.body,
+      payload,
     );
 
     sendResponse(res, {

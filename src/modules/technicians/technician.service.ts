@@ -2,8 +2,10 @@ import httpStatus from "http-status";
 import AppError from "../../errors/AppError";
 import { prisma } from "../../lib/prisma";
 import {
+  IServiceFilters,
   IServicePayload,
   ITechnicialProfileUpdatePayload,
+  ITechnicianFilters,
   IUpdateAvaiablityPayload,
   IUpdateBookingStatusPayload,
 } from "./technician.interface";
@@ -49,8 +51,32 @@ const createNewServiceIntoDB = async (
   return newService;
 };
 
-const getAllServicesFromDB = async () => {
-  const allServices = await prisma.service.findMany();
+const getAllServicesFromDB = async (filters: IServiceFilters) => {
+  const { categoryId, location, minPrice, maxPrice, minRating } = filters;
+
+  const allServices = await prisma.service.findMany({
+    where: {
+      isActive: true,
+      ...(categoryId && { categoryId }),
+      ...((minPrice || maxPrice) && {
+        price: {
+          ...(minPrice && { gte: Number(minPrice) }),
+          ...(maxPrice && { lte: Number(maxPrice) }),
+        },
+      }),
+      technicianProfile: {
+        ...(location && {
+          location: { contains: location, mode: "insensitive" },
+        }),
+        ...(minRating && { averageRating: { gte: Number(minRating) } }),
+      },
+    },
+    include: {
+      technicianProfile: true,
+      category: true,
+    },
+  });
+
   return allServices;
 };
 
@@ -71,8 +97,26 @@ const getTechnicianProfileFromDB = async (technicialId: string) => {
   return profile;
 };
 
-const getAllTechnicianFromDB = async () => {
-  const allTechnician = await prisma.technicianProfile.findMany();
+const getAllTechnicianFromDB = async (filters: ITechnicianFilters) => {
+  const { location, minRating, isAvailable, categoryId } = filters;
+
+  const allTechnician = await prisma.technicianProfile.findMany({
+    where: {
+      ...(location && {
+        location: { contains: location, mode: "insensitive" },
+      }),
+      ...(minRating && { averageRating: { gte: Number(minRating) } }),
+      ...(isAvailable !== undefined && {
+        isAvailable: isAvailable === "true",
+      }),
+      ...(categoryId && { services: { some: { categoryId } } }),
+    },
+    include: {
+      user: { omit: { password: true } },
+      services: true,
+    },
+  });
+
   return allTechnician;
 };
 
