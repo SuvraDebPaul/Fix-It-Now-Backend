@@ -34,4 +34,53 @@ const gelAllCategory = catchAsync(
   },
 );
 
-export const adminController = { createNewCategory, gelAllCategory };
+const getAllUsers = catchAsync(
+  async (req: Request, res: Response, Next: NextFunction) => {
+    const users = await adminService.getAllUserFromDB();
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "All Users Fetched",
+      data: users,
+    });
+  },
+);
+
+const updateUserStatus = catchAsync(
+  async (req: Request, res: Response, Next: NextFunction) => {
+    const { id } = req.params;
+
+    const updatedUser = await adminService.updateUserStatusIntoDB(
+      id as string,
+      req.body,
+    );
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "User status updated successfully",
+      data: updatedUser,
+    });
+  },
+);
+
+const getAllBookings = catchAsync(
+  async (req: Request, res: Response, Next: NextFunction) => {
+    const bookings = await adminService.getAllBookingsFromDB();
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "All Bookings Fetched",
+      data: bookings,
+    });
+  },
+);
+
+export const adminController = {
+  createNewCategory,
+  gelAllCategory,
+  getAllUsers,
+  updateUserStatus,
+  getAllBookings,
+};
