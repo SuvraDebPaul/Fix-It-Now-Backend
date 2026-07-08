@@ -42,16 +42,12 @@ app.get("/payment-cancel", (req: Request, res: Response) => {
 });
 
 app.use("/api", categoryRoutes);
-
 app.use("/api/auth", userRoutes);
 app.use("/api/auth", authRoutes);
-
 app.use("/api", technicianRoutes);
 app.use("/api", bookingRoutes);
 app.use("/api/admin", adminRoutes);
-
 app.use("/api", paymentRoutes);
-
 app.use("/api", reviewRoutes);
 
 app.use(notFound);
