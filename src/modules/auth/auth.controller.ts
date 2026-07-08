@@ -4,6 +4,7 @@ import { authService } from "./auth.service";
 import sendResponse from "../../utils/sendResponse";
 import httpStatus from "http-status";
 import AppError from "../../errors/AppError";
+import config from "../../config";
 
 const loginUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -18,16 +19,29 @@ const loginUser = catchAsync(
     }
     const { accessToken, refreshToken } = await authService.loginUser(payload);
 
+    // res.cookie("accessToken", accessToken, {
+    //   httpOnly: true,
+    //   secure: false,
+    //   sameSite: "none",
+    //   maxAge: 1000 * 60 * 60 * 24,
+    // });
+    // res.cookie("refreshToken", refreshToken, {
+    //   httpOnly: true,
+    //   secure: false,
+    //   sameSite: "none",
+    //   maxAge: 1000 * 60 * 60 * 24 * 7,
+    // });
+
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
-      secure: false,
-      sameSite: "none",
+      secure: config.node_env === "production",
+      sameSite: config.node_env === "production" ? "none" : "lax",
       maxAge: 1000 * 60 * 60 * 24,
     });
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: false,
-      sameSite: "none",
+      secure: config.node_env === "production",
+      sameSite: config.node_env === "production" ? "none" : "lax",
       maxAge: 1000 * 60 * 60 * 24 * 7,
     });
 

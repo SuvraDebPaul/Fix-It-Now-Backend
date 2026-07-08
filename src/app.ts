@@ -12,6 +12,8 @@ import { technicianRoutes } from "./modules/technicians/technician.routes";
 import { bookingRoutes } from "./modules/bookings/booking.routes";
 import { paymentRoutes } from "./modules/payments/payment.routes";
 import { reviewRoutes } from "./modules/reviews/review.routes";
+import swaggerUi from "swagger-ui-express";
+import openapiSpec from "./docs/openapi";
 
 const app: Application = express();
 
@@ -27,6 +29,19 @@ app.get("/", (req: Request, res: Response) => {
 app.get("/api", (req: Request, res: Response) => {
   res.send("Fix It Now API is Running");
 });
+
+app.use(
+  "/api-docs",
+  swaggerUi.serve,
+  swaggerUi.setup(openapiSpec, {
+    swaggerOptions: {
+      requestInterceptor: (req: any) => {
+        req.credentials = "include";
+        return req;
+      },
+    },
+  }),
+);
 
 app.get("/payment-success", (req: Request, res: Response) => {
   const { session_id } = req.query;
