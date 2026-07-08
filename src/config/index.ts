@@ -19,6 +19,7 @@ const config = {
   jwt_refresh_secret: env.JWT_REFRESH_SECRET,
   jwt_access_expires_in: env.JWT_ACCESS_EXPIRES_IN || "1d",
   jwt_refresh_expires_in: env.JWT_REFRESH_EXPIRES_IN || "7d",
+  stripe_secret_key: env.STRIPE_SECRET_KEY,
 };
 
 export default config;
