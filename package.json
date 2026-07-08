@@ -11,7 +11,7 @@
     "typecheck": "tsc --noEmit",
     "build": "tsup src/server.ts --format esm --platform node --target node20 --out-dir dist --clean",
     "start": "node dist/server.js",
-    "vercel-build": "prisma generate && tsup src/app.ts --format esm --platform node --target node20 --out-dir dist-vercel --clean",
+    "vercel-build": "prisma generate && tsup src/index.ts --format esm --platform node --target node20 --out-dir api --clean",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio"
