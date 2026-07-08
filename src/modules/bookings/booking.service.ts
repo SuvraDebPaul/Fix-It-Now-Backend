@@ -1,5 +1,7 @@
 import { prisma } from "../../lib/prisma";
 import { IBookingPayload } from "./booking.interface";
+import httpStatus from "http-status";
+import AppError from "../../errors/AppError";
 
 const createNewBookingIntoDB = async (
   payload: IBookingPayload,
@@ -71,8 +73,41 @@ const getBookingDetailsById = async (bookingId: string) => {
 
   return bookingDetails;
 };
+
+const cancelBookingIntoDB = async (
+  bookingId: string,
+  userId: string,
+  cancelReason: string,
+) => {
+  const booking = await prisma.booking.findUniqueOrThrow({
+    where: { id: bookingId },
+    include: { customerProfile: true },
+  });
+
+  if (booking.customerProfile.userId !== userId) {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      "You are not allowed to cancel this booking",
+    );
+  }
+
+  if (["IN_PROGRESS", "COMPLETED", "CANCELLED"].includes(booking.status)) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      `Booking cannot be cancelled once it is ${booking.status}`,
+    );
+  }
+
+  const updatedBooking = await prisma.booking.update({
+    where: { id: bookingId },
+    data: { status: "CANCELLED", cancelReason },
+  });
+
+  return updatedBooking;
+};
 export const bookingService = {
   createNewBookingIntoDB,
   getCustomerBookingsFromDB,
   getBookingDetailsById,
+  cancelBookingIntoDB,
 };

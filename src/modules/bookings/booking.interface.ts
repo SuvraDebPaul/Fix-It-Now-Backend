@@ -8,3 +8,6 @@ export interface IBookingPayload {
   cancelReason?: string;
   completedAt?: Date;
 }
+export interface ICancelBookingPayload {
+  cancelReason?: string;
+}

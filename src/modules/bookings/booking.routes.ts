@@ -15,5 +15,15 @@ router.get(
   auth(Role.CUSTOMER, Role.ADMIN),
   bookingController.getCustomerBookings,
 );
-router.get("/bookings/:id", bookingController.getBookingDetailsById);
+router.get(
+  "/bookings/:id",
+  auth(Role.CUSTOMER, Role.TECHNICIAN, Role.ADMIN),
+  bookingController.getBookingDetailsById,
+);
+router.patch(
+  "/bookings/:id/cancel",
+  auth(Role.CUSTOMER),
+  bookingController.cancelBooking,
+);
+
 export const bookingRoutes = router;
