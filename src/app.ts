@@ -12,7 +12,6 @@ import { technicianRoutes } from "./modules/technicians/technician.routes";
 import { bookingRoutes } from "./modules/bookings/booking.routes";
 import { paymentRoutes } from "./modules/payments/payment.routes";
 import { reviewRoutes } from "./modules/reviews/review.routes";
-import swaggerUi from "swagger-ui-express";
 import openapiSpec from "./docs/openapi";
 
 const app: Application = express();
@@ -30,18 +29,36 @@ app.get("/api", (req: Request, res: Response) => {
   res.send("Fix It Now API is Running");
 });
 
-app.use(
-  "/api-docs",
-  swaggerUi.serve,
-  swaggerUi.setup(openapiSpec, {
-    swaggerOptions: {
-      requestInterceptor: (req: any) => {
-        req.credentials = "include";
-        return req;
-      },
-    },
-  }),
-);
+app.get("/api-docs.json", (req: Request, res: Response) => {
+  res.json(openapiSpec);
+});
+
+app.get("/api-docs", (req: Request, res: Response) => {
+  res.send(`<!DOCTYPE html>
+<html>
+  <head>
+    <title>FixItNow API Docs</title>
+    <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css" />
+  </head>
+  <body>
+    <div id="swagger-ui"></div>
+    <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
+    <script>
+      window.onload = () => {
+        window.ui = SwaggerUIBundle({
+          url: "/api-docs.json",
+          dom_id: "#swagger-ui",
+          presets: [SwaggerUIBundle.presets.apis],
+          requestInterceptor: (req) => {
+            req.credentials = "include";
+            return req;
+          },
+        });
+      };
+    </script>
+  </body>
+</html>`);
+});
 
 app.get("/payment-success", (req: Request, res: Response) => {
   const { session_id } = req.query;
