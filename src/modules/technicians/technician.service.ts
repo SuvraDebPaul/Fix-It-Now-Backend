@@ -5,6 +5,7 @@ import {
   IServicePayload,
   ITechnicialProfileUpdatePayload,
   IUpdateAvaiablityPayload,
+  IUpdateBookingStatusPayload,
 } from "./technician.interface";
 import { isValidTimeFormat, timeToMinutes } from "../../utils/utils";
 
@@ -179,6 +180,83 @@ const updateAvailabilityIntoDB = async (
   return result;
 };
 
+const getTechnicianBookingsFromDB = async (userId: string) => {
+  const technicianProfile = await prisma.technicianProfile.findUnique({
+    where: { userId },
+  });
+  if (!technicianProfile) {
+    throw new AppError(httpStatus.NOT_FOUND, "Technician profile not found");
+  }
+
+  const bookings = await prisma.booking.findMany({
+    where: { technicianProfileId: technicianProfile.id },
+    include: {
+      customerProfile: {
+        include: {
+          user: {
+            omit: { password: true },
+          },
+        },
+      },
+      service: true,
+      payment: true,
+    },
+  });
+  return bookings;
+};
+
+const ALLOWED_TRANSITIONS: Record<string, string[]> = {
+  REQUESTED: ["ACCEPTED", "DECLINED"],
+  PAID: ["IN_PROGRESS"],
+  IN_PROGRESS: ["COMPLETED"],
+};
+
+const updateBookingStatusIntoDB = async (
+  userId: string,
+  bookingId: string,
+  payload: IUpdateBookingStatusPayload,
+) => {
+  const { status } = payload;
+
+  if (!status) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Status is required");
+  }
+
+  const technicianProfile = await prisma.technicianProfile.findUniqueOrThrow({
+    where: { userId },
+  });
+
+  const booking = await prisma.booking.findUniqueOrThrow({
+    where: { id: bookingId },
+  });
+
+  if (booking.technicianProfileId !== technicianProfile.id) {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      "You are not allowed to update this booking",
+    );
+  }
+
+  const allowedNextStatuses = ALLOWED_TRANSITIONS[booking.status] || [];
+
+  if (!allowedNextStatuses.includes(status)) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      `Cannot change booking status from ${booking.status} to ${status}`,
+    );
+  }
+
+  const updatedBooking = await prisma.booking.update({
+    where: { id: bookingId },
+    data: {
+      status,
+      completedAt: status === "COMPLETED" ? new Date() : undefined,
+    },
+  });
+
+  return updatedBooking;
+};
+
 export const technicianService = {
   createNewServiceIntoDB,
   getAllServicesFromDB,
@@ -186,4 +264,6 @@ export const technicianService = {
   getAllTechnicianFromDB,
   updateTechnicianProfile,
   updateAvailabilityIntoDB,
+  getTechnicianBookingsFromDB,
+  updateBookingStatusIntoDB,
 };

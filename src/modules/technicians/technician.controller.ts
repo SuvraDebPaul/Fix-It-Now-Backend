@@ -114,6 +114,42 @@ const updateAvaiablitySlots = catchAsync(
   },
 );
 
+const getTechnicianBookings = catchAsync(
+  async (req: Request, res: Response, Next: NextFunction) => {
+    const userId = req.user?.id as string;
+
+    const bookings =
+      await technicianService.getTechnicianBookingsFromDB(userId);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Technician Bookings Fetched",
+      data: bookings,
+    });
+  },
+);
+
+const updateBookingStatus = catchAsync(
+  async (req: Request, res: Response, Next: NextFunction) => {
+    const userId = req.user?.id as string;
+    const { id } = req.params;
+
+    const updatedBooking = await technicianService.updateBookingStatusIntoDB(
+      userId,
+      id as string,
+      req.body,
+    );
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Booking status updated successfully",
+      data: updatedBooking,
+    });
+  },
+);
+
 export const technicianController = {
   createNewService,
   gelAllServices,
@@ -121,4 +157,6 @@ export const technicianController = {
   getAllTechnician,
   updateTechnicianProfile,
   updateAvaiablitySlots,
+  getTechnicianBookings,
+  updateBookingStatus,
 };

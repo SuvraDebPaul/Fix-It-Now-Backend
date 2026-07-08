@@ -23,4 +23,7 @@ router.put(
 router.get("/technician/bookings", auth(Role.TECHNICIAN));
 router.patch("/technician/bookings/:id", auth(Role.TECHNICIAN));
 
+router.get("/technician/bookings", auth(Role.TECHNICIAN));
+router.patch("/technician/bookings/:id", auth(Role.TECHNICIAN));
+
 export const technicianRoutes = router;

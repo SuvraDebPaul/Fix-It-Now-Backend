@@ -32,3 +32,7 @@ export interface isAvailabilitySlot {
 export interface IUpdateAvaiablityPayload {
   slots: isAvailabilitySlot[];
 }
+
+export interface IUpdateBookingStatusPayload {
+  status: "ACCEPTED" | "DECLINED" | "IN_PROGRESS" | "COMPLETED";
+}
