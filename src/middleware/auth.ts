@@ -25,7 +25,7 @@ export const auth = (...requiredRoles: Role[]) => {
     try {
       const token = req.cookies.accessToken
         ? req.cookies.accessToken
-        : req.headers.authorization?.startsWith("bearer")
+        : req.headers.authorization?.toLowerCase().startsWith("bearer")
           ? req.headers.authorization?.split(" ")[1]
           : req.headers.authorization;
 

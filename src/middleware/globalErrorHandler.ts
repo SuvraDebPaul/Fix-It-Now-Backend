@@ -1,7 +1,7 @@
 import { ErrorRequestHandler, Request, Response, NextFunction } from "express";
 import config from "../config";
 
-type TErrorSouce = {
+type TErrorDetail = {
   path: string;
   message: string;
 };
@@ -20,7 +20,7 @@ export const globalErrorHandler: ErrorRequestHandler = (
   let statusCode = error.statusCode || 500;
   let message = error.message || "Something went wrong";
 
-  let errorSources: TErrorSouce[] = [
+  let errorDetails: TErrorDetail[] = [
     {
       path: req.originalUrl,
       message,
@@ -30,7 +30,7 @@ export const globalErrorHandler: ErrorRequestHandler = (
   res.status(statusCode).json({
     success: false,
     message,
-    errorSources,
+    errorDetails,
     error:
       config.node_env === "development"
         ? {

@@ -17,9 +17,10 @@ const createNewServiceIntoDB = async (
 ) => {
   const { categoryId, title, description, price } = payload;
 
-  const technicianProfile = await prisma.user.findUniqueOrThrow({
-    where: { id: userId },
+  const technicianProfile = await prisma.technicianProfile.findUniqueOrThrow({
+    where: { userId },
   });
+
   if (!technicianProfile) {
     throw new AppError(
       httpStatus.FORBIDDEN,
